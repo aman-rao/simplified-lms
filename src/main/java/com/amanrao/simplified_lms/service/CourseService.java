@@ -8,4 +8,6 @@ import java.util.List;
 public interface CourseService {
     Course saveCourse(Course course);
     List<Course> getCoursesByInstructor(User instructor);
+    List <Course> getAllCourses();
+    Course getCourseById(Long id);
 }

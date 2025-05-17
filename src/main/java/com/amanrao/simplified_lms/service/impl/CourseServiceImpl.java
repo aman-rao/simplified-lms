@@ -24,4 +24,15 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getCoursesByInstructor(User instructor) {
         return courseRepository.findByInstructor(instructor);
     }
+
+    @Override
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    @Override
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid course ID: " + id));
+    }
 }
