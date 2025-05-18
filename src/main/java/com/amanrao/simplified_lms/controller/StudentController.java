@@ -49,4 +49,22 @@ public class StudentController {
         enrollmentService.enrollStudentInCourse(student, course);
         return "redirect:/student/dashboard";
     }
+
+    @GetMapping("/course/{courseId}")
+    public String viewCourse(@PathVariable Long courseId,
+                             @AuthenticationPrincipal CustomUserDetails userDetails,
+                             Model model) {
+        User student = userService.findByEmail(userDetails.getUsername());
+        Course course = courseService.getCourseById(courseId);
+
+        // Ensure the student is enrolled
+        boolean isEnrolled = enrollmentService.isEnrolled(student, course);
+        if (!isEnrolled) {
+            return "redirect:/student/dashboard?error=accessDenied";
+        }
+
+        model.addAttribute("course", course);
+        return "student/course_details";
+    }
+
 }
