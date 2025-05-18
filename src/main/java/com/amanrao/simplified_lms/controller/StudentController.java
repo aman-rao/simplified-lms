@@ -8,6 +8,7 @@ import com.amanrao.simplified_lms.service.CourseService;
 import com.amanrao.simplified_lms.service.EnrollmentService;
 import com.amanrao.simplified_lms.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,22 +27,25 @@ public class StudentController {
     private final UserService userService;
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        User student = userService.findByEmail(userDetails.getUsername());
-        List<Course> availableCourses = courseService.getAllCourses();
-        List<Course> enrolledCourses = enrollmentService.getEnrollmentsForStudent(student)
-                .stream()
-                .map(Enrollment::getCourse)
-                .toList();
+    public String dashboard(@AuthenticationPrincipal CustomUserDetails userDetails,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size,
+                            Model model) {
 
-        availableCourses.removeAll(enrolledCourses);
+        User student = userService.findByEmail(userDetails.getUsername());
+
+        Page<Course> availableCourses = courseService.getAvailableCourses(student, page, size);
+        List<Enrollment> enrolledCourses = enrollmentService.getEnrollmentsForStudent(student);
 
         model.addAttribute("student", student);
-        model.addAttribute("availableCourses", availableCourses);
         model.addAttribute("enrolledCourses", enrolledCourses);
+        model.addAttribute("availableCourses", availableCourses.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", availableCourses.getTotalPages());
 
         return "student/dashboard";
     }
+
 
     @PostMapping("/enroll")
     public String enroll(@RequestParam Long courseId,

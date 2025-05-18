@@ -39,9 +39,9 @@
             </div>
             <ul class="list-group" th:if="${!#lists.isEmpty(enrolledCourses)}">
                 <li class="list-group-item d-flex justify-content-between align-items-center"
-                    th:each="course : ${enrolledCourses}">
-                    <span th:text="${course.title}">Course Title</span>
-                    <a th:href="@{'/student/course/' + ${course.id}}" class="btn btn-sm btn-outline-primary">View Course</a>
+                    th:each="enrollment : ${enrolledCourses}">
+                    <span th:text="${enrollment.course.title}">Course Title</span>
+                    <a th:href="@{'/student/course/' + ${enrollment.course.id}}" class="btn btn-sm btn-outline-primary">View Course</a>
                 </li>
             </ul>
         </div>
@@ -63,6 +63,20 @@
                     </form>
                 </li>
             </ul>
+            <nav th:if="${totalPages > 1}">
+                <ul class="pagination mt-3">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${currentPage - 1})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${currentPage + 1})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
