@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -43,10 +44,20 @@ public class StudentController {
     }
 
     @PostMapping("/enroll")
-    public String enroll(@RequestParam Long courseId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public String enroll(@RequestParam Long courseId,
+                         @AuthenticationPrincipal CustomUserDetails userDetails,
+                         RedirectAttributes redirectAttributes) {
         User student = userService.findByEmail(userDetails.getUsername());
         Course course = courseService.getCourseById(courseId);
+
+        // Check if already enrolled
+        if (enrollmentService.isEnrolled(student, course)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this course.");
+            return "redirect:/student/dashboard";
+        }
+
         enrollmentService.enrollStudentInCourse(student, course);
+        redirectAttributes.addFlashAttribute("successMessage", "Successfully enrolled in " + course.getTitle() + "!");
         return "redirect:/student/dashboard";
     }
 
