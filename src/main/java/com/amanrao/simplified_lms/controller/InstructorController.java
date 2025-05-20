@@ -2,9 +2,12 @@ package com.amanrao.simplified_lms.controller;
 
 import com.amanrao.simplified_lms.model.Assignment;
 import com.amanrao.simplified_lms.model.Course;
+import com.amanrao.simplified_lms.model.Enrollment;
 import com.amanrao.simplified_lms.model.User;
+import com.amanrao.simplified_lms.security.CustomUserDetails;
 import com.amanrao.simplified_lms.service.AssignmentService;
 import com.amanrao.simplified_lms.service.CourseService;
+import com.amanrao.simplified_lms.service.EnrollmentService;
 import com.amanrao.simplified_lms.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +31,7 @@ public class InstructorController {
     private final CourseService courseService;
     private final AssignmentService assignmentService;
     private final UserService userService;
+    private final EnrollmentService enrollmentService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -74,5 +78,23 @@ public class InstructorController {
         assignment.setCourse(course);
         assignmentService.saveAssignment(assignment, file);
         return "redirect:/instructor/course/" + courseId;
+    }
+
+    @GetMapping("/course/{courseId}/students")
+    public String viewEnrolledStudents(@PathVariable Long courseId,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails,
+                                       Model model) {
+        User instructor = userService.findByEmail(userDetails.getUsername());
+        Course course = courseService.getCourseById(courseId);
+
+        if (!course.getInstructor().getId().equals(instructor.getId())) {
+            return "redirect:/instructor/dashboard?error=accessDenied";
+        }
+
+        List<Enrollment> enrollments = enrollmentService.getEnrollmentsForCourse(course);
+
+        model.addAttribute("course", course);
+        model.addAttribute("enrolledStudents", enrollments);
+        return "instructor/enrolled-students";
     }
 }

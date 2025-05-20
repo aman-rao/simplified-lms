@@ -9,6 +9,7 @@ import com.amanrao.simplified_lms.service.EnrollmentService;
 import com.amanrao.simplified_lms.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,8 @@ public class StudentController {
         User student = userService.findByEmail(userDetails.getUsername());
 
         Page<Course> availableCourses = courseService.getAvailableCourses(student, page, size);
-        List<Enrollment> enrolledCourses = enrollmentService.getEnrollmentsForStudent(student);
+        Page<Enrollment> enrolledCourses = enrollmentService.getEnrollmentsForStudent(student, PageRequest.of(page, size));
+
 
         model.addAttribute("student", student);
         model.addAttribute("enrolledCourses", enrolledCourses);

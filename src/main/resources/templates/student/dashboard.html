@@ -37,13 +37,29 @@
             <div th:if="${#lists.isEmpty(enrolledCourses)}">
                 <p class="text-muted">You are not enrolled in any courses yet.</p>
             </div>
+
             <ul class="list-group" th:if="${!#lists.isEmpty(enrolledCourses)}">
+
                 <li class="list-group-item d-flex justify-content-between align-items-center"
                     th:each="enrollment : ${enrolledCourses}">
                     <span th:text="${enrollment.course.title}">Course Title</span>
                     <a th:href="@{'/student/course/' + ${enrollment.course.id}}" class="btn btn-sm btn-outline-primary">View Course</a>
                 </li>
             </ul>
+            <nav th:if="${totalPagesEnrolled > 1}">
+                <ul class="pagination mt-3">
+                    <li class="page-item" th:classappend="${currentPageEnrolled == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${currentPageEnrolled - 1})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPagesEnrolled - 1)}"
+                        th:classappend="${i == currentPageEnrolled} ? 'active'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPageEnrolled + 1 >= totalPagesEnrolled} ? 'disabled'">
+                        <a class="page-link" th:href="@{'/student/dashboard'(page=${currentPageEnrolled + 1})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 
