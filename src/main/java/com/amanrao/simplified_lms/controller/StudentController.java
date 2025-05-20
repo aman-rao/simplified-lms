@@ -31,11 +31,15 @@ public class StudentController {
     public String dashboard(@AuthenticationPrincipal CustomUserDetails userDetails,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
+                            @RequestParam(required = false) String keyword,
                             Model model) {
 
         User student = userService.findByEmail(userDetails.getUsername());
 
-        Page<Course> availableCourses = courseService.getAvailableCourses(student, page, size);
+        Page<Course> availableCourses = (keyword != null && !keyword.isBlank())
+                ? courseService.searchAvailableCourses(student, keyword, page, size)
+                : courseService.getAvailableCourses(student, page, size);
+
         Page<Enrollment> enrolledCourses = enrollmentService.getEnrollmentsForStudent(student, PageRequest.of(page, size));
 
 
@@ -44,6 +48,7 @@ public class StudentController {
         model.addAttribute("availableCourses", availableCourses.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", availableCourses.getTotalPages());
+        model.addAttribute("keyword", keyword);
 
         return "student/dashboard";
     }
