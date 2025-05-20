@@ -13,4 +13,7 @@ import org.springframework.data.domain.Page;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByInstructor(User instructor);
     Page<Course> findByIdNotIn(List<Long> ids, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCaseAndIdNotIn(String keyword, List<Long> ids, Pageable pageable);
+    Page<Course> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
+
 }

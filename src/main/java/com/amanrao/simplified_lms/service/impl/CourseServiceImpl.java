@@ -55,6 +55,20 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
+    @Override
+    public Page<Course> searchAvailableCourses(User student, String keyword, int page, int size) {
+        List<Long> enrolledIds = enrollmentRepository.findByStudent(student)
+                .stream().map(e -> e.getCourse().getId()).toList();
+
+        Pageable pageable = PageRequest.of(page, size);
+        if (enrolledIds.isEmpty()) {
+            return courseRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        } else {
+            return courseRepository.findByTitleContainingIgnoreCaseAndIdNotIn(keyword, enrolledIds, pageable);
+        }
+    }
+
+
 
 
 }

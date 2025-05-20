@@ -15,4 +15,6 @@ public interface CourseService {
     List <Course> getAllCourses();
     Course getCourseById(Long id);
     Page<Course> getAvailableCourses(User student, int page, int size);
+    Page<Course> searchAvailableCourses(User student, String keyword, int page, int size);
+
 }
