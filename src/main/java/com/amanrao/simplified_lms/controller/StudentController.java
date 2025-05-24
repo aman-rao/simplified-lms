@@ -79,14 +79,24 @@ public class StudentController {
         User student = userService.findByEmail(userDetails.getUsername());
         Course course = courseService.getCourseById(courseId);
 
-        // Ensure the student is enrolled
-        boolean isEnrolled = enrollmentService.isEnrolled(student, course);
-        if (!isEnrolled) {
+        // Check enrollment
+        if (!enrollmentService.isEnrolled(student, course)) {
             return "redirect:/student/dashboard?error=accessDenied";
         }
 
+        // Mock lessons for now
+        List<String> lessons = List.of(
+                "Introduction to the course",
+                "Understanding key concepts",
+                "Practical examples",
+                "Final review"
+        );
+
         model.addAttribute("course", course);
+        model.addAttribute("lessons", lessons);
+
         return "student/course_details";
     }
+
 
 }
